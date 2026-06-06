@@ -6,10 +6,14 @@ const express = require("express");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
+const employeeRoutes = require("./routes/employeeRoutes");
 
 const app = express();
+app.use(express.json());
+
 
 connectDB();
+app.use(employeeRoutes);
 
 app.get("/", (req, res) => {
   res.send("Employee Management API Running");
