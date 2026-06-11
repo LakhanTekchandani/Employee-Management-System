@@ -1,8 +1,93 @@
-import { Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import Navbar from "../components/Navbar";
 
 function EditEmployee({ employee = {}, onDelete }) {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const handleChange = (e) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.patch(
+      `http://localhost:5000/employees/${id}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert("Employee Updated Successfully");
+    navigate("/employees");
+
+  } catch (error) {
+    console.log(error);
+    alert("Failed to Update Employee");
+  }
+};
+const handleDelete = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.delete(
+      `http://localhost:5000/employees/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert("Employee Deleted Successfully");
+    navigate("/employees");
+
+  } catch (error) {
+    console.log(error);
+    alert("Failed to Delete Employee");
+  }
+};
+
+const [formData, setFormData] = useState({
+  name: "",
+  email: "",
+  phone: "",
+  department: "",
+  designation: "",
+  salary: "",
+  joiningDate: "",
+});
+const fetchEmployee = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(
+      `http://localhost:5000/employees/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setFormData(response.data.employee);
+  } catch (error) {
+    console.log(error);
+  }
+};
+useEffect(() => {
+  fetchEmployee();
+}, []);
 
   return (
     <div className="app-shell">
@@ -17,41 +102,47 @@ function EditEmployee({ employee = {}, onDelete }) {
           </div>
         </section>
 
-        <form className="employee-form fade-in delay-1">
+        <form className="employee-form fade-in delay-1" onSubmit={handleSubmit}>
           <div className="form-grid">
             <label className="field">
               <span>Name</span>
-              <input name="name" type="text" defaultValue={employee.name || ""} required />
+              <input name="name" type="text" value={formData.name}onChange={handleChange} required />
             </label>
 
             <label className="field">
               <span>Email</span>
-              <input name="email" type="email" defaultValue={employee.email || ""} required />
+              <input name="email" type="email" value={formData.email}
+  onChange={handleChange} required />
             </label>
 
             <label className="field">
               <span>Phone</span>
-              <input name="phone" type="tel" defaultValue={employee.phone || ""} required />
+              <input name="phone" type="tel" value={formData.phone}
+  onChange={handleChange} required />
             </label>
 
             <label className="field">
               <span>Department</span>
-              <input name="department" type="text" defaultValue={employee.department || ""} required />
+              <input name="department" type="text" value={formData.department}
+  onChange={handleChange} required />
             </label>
 
             <label className="field">
               <span>Designation</span>
-              <input name="designation" type="text" defaultValue={employee.designation || ""} required />
+              <input name="designation" type="text" value={formData.designation}
+  onChange={handleChange} required />
             </label>
 
             <label className="field">
               <span>Salary</span>
-              <input name="salary" type="number" defaultValue={employee.salary || ""} required />
+              <input name="salary" type="number" value={formData.salary}
+  onChange={handleChange} required />
             </label>
 
             <label className="field">
               <span>Joining Date</span>
-              <input name="joiningDate" type="date" defaultValue={employee.joiningDate || ""} required />
+              <input name="joiningDate" type="date" value={formData.joiningDate}
+  onChange={handleChange} required />
             </label>
           </div>
 
@@ -70,7 +161,7 @@ function EditEmployee({ employee = {}, onDelete }) {
             <h2>Danger Zone</h2>
             <p>Deleting this employee removes the record from the directory.</p>
           </div>
-          <button className="danger-btn" type="button" onClick={() => onDelete && onDelete(id)}>
+          <button className="danger-btn" type="button"  onClick={handleDelete}>
             Delete Employee
           </button>
         </section>

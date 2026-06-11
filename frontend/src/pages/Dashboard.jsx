@@ -1,7 +1,32 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Navbar from "../components/Navbar";
 
-function Dashboard({ totalEmployees = 0 }) {
+function Dashboard() {
+  const [totalEmployees, setTotalEmployees] = useState(0);
+  useEffect(() => {
+  const fetchEmployees = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        "http://localhost:5000/employees",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setTotalEmployees(response.data.employees.length);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  fetchEmployees();
+}, []);
   return (
     <div className="app-shell">
       <Navbar />

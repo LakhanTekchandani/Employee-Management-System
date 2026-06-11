@@ -1,9 +1,12 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import Navbar from "../components/Navbar";
 
-function EmployeeList({ employees = [], onDelete }) {
+function EmployeeList() {
+
   const [searchTerm, setSearchTerm] = useState("");
+  const [employees, setEmployees] = useState([]);
 
   const filteredEmployees = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -28,6 +31,52 @@ function EmployeeList({ employees = [], onDelete }) {
     );
   }, [employees, searchTerm]);
 
+  const fetchEmployees = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(
+      "http://localhost:5000/employees",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setEmployees(response.data.employees);
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+useEffect(() => {
+  fetchEmployees();
+}, []);
+
+const handleDelete = async (id) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.delete(
+      `http://localhost:5000/employees/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert("Employee Deleted Successfully");
+
+    fetchEmployees();
+
+  } catch (error) {
+    console.log(error);
+    alert("Failed to Delete Employee");
+  }
+};
+
   return (
     <div className="app-shell">
       <Navbar />
@@ -37,7 +86,7 @@ function EmployeeList({ employees = [], onDelete }) {
           <div>
             <p className="eyebrow">Directory</p>
             <h1>Employees</h1>
-            <p>Search, review, and maintain employee records.</p>
+            <p>Search, review, and maintain employee records.</p> 
           </div>
           <Link to="/add-employee" className="primary-btn">
             Add Employee
@@ -87,7 +136,7 @@ function EmployeeList({ employees = [], onDelete }) {
                           <button
                             className="danger-btn small"
                             type="button"
-                            onClick={() => onDelete && onDelete(employee._id || employee.id)}
+                            onClick={() => handleDelete(employee._id)}
                           >
                             Delete
                           </button>

@@ -5,12 +5,13 @@ const { getEmployee } = require("../controllers/employeeController");
 const { getEmployees } = require("../controllers/employeeController");
 const { updateEmployee } = require("../controllers/employeeController");
 const { deleteEmployee } = require("../controllers/employeeController");
+const authMiddleware = require("../middleware/authMiddleware");
 
-router.post("/employees", createEmployee);
-router.get("/employees",getEmployees);
-router.get("/employees/:id",getEmployee);
-router.patch("/employees/:id",updateEmployee);
-router.delete("/employees/:id",deleteEmployee);
+router.post("/employees",authMiddleware, createEmployee);
+router.get("/employees",authMiddleware, getEmployees);
+router.get("/employees/:id",authMiddleware, getEmployee);
+router.patch("/employees/:id",authMiddleware, updateEmployee);
+router.delete("/employees/:id",authMiddleware, deleteEmployee);
 
 
 module.exports = router;

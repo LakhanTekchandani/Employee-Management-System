@@ -1,3 +1,4 @@
+const cors = require("cors");
 const dns = require("dns");
 
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
@@ -7,10 +8,13 @@ require("dotenv").config();
 
 const connectDB = require("./config/db");
 const employeeRoutes = require("./routes/employeeRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
-app.use(express.json());
 
+app.use(cors());
+app.use(express.json());
+app.use("/api/auth",authRoutes);
 
 connectDB();
 app.use(employeeRoutes);

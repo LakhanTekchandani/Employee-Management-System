@@ -5,11 +5,11 @@ function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    setIsMenuOpen(false);
-    navigate("/");
-  };
-
+ const handleLogout = () => {
+  localStorage.removeItem("token");
+  setIsMenuOpen(false);
+  navigate("/");
+};
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
